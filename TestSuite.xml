@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="TestTaskSuite">
+    <test name="Test1">
+        <classes>
+            <class
+                    name="ivchenko.qa.pages.MainPageTests" />
+        </classes>
+    </test>
+</suite>
