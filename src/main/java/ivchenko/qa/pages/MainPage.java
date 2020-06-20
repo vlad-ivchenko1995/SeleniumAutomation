@@ -9,45 +9,46 @@ import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class MainPage extends Page {
 
-	private GooglePage googlePage;
-
-
 	//WebElements
-	@FindBy(id = "cancelForm")
+	@FindBy(id = "inputEmail")
 	@CacheLookup
-	private WebElement cancelButton;
+	private WebElement emailInput;
 
-	@FindBy(id = "gsr")
-	private WebElement googleFrame;
+	@FindBy(id = "inputPassword")
+	private WebElement passwordInput;
 
-	@FindBy(id = "saveForm")
+	@FindBy(xpath = "//input[contains(@class, 'zak-pass-style-log error')]")
+	private WebElement errorPasswordInput;
+
+	@FindBy(xpath = "//input[@class='form-login-input error']")
+	private WebElement errorEmailInput;
+
+	@FindBy(xpath = "//input[@class='btn btn-success zak-log-btn']")
 	@CacheLookup
-	private WebElement saveButton;
+	private WebElement comeInButton;
 
-	@FindBy(id = "form_testtask")
+	@FindBy(xpath = "//*[text()='Перевірте адресу ел. пошти ']")
 	@CacheLookup
-	private WebElement testForm;
+	private WebElement verifyEmailText;
 
-	@FindBy(id = "input_code")
+	@FindBy(xpath = "//*[text()='Введіть ел. пошту']")
 	@CacheLookup
-	private WebElement inputCodeField;
+	private WebElement enterEmailText;
 
-	@FindBy(id = "main_body")
+	@FindBy(xpath = "//*[text()='Введіть пароль']")
 	@CacheLookup
-	private WebElement appFrame;
+	private WebElement enterPasswordText;
 
-	@FindBy(xpath = "//*[contains(h2, 'SampleWebsite')]")
+	@FindBy(xpath = "//*[text()='Неправильний пароль']")
 	@CacheLookup
-	private WebElement textSampleWebsite;
+	private WebElement incorrectPasswordText;
 
-	@FindBy(xpath = "//*[contains(text(), 'Made by Vladyslav Ivchenko')]")
+	@FindBy(xpath = "//*[text()='Як почати брати участь у закупівлях']")
 	@CacheLookup
-	private WebElement textFooter;
-	private Object GooglePage;
+	private WebElement headerAfterLoginPageText;
 
 	public MainPage(WebDriver webDriver) {
 		super(webDriver);
@@ -56,124 +57,67 @@ public class MainPage extends Page {
 
 	//Methods
 	@Step
-	public String getValidationMessage(){ WebElement notificationMessage = new WebDriverWait(webDriver, 10).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@class='input_field' and @id='input_code']")));
-		System.out.println(notificationMessage.getAttribute("validationMessage"));
-		return notificationMessage.getAttribute("validationMessage");
-	}
-
-	//Methods
-	@Step
 	public MainPage verifyAllElementsAreDisplayed(){
 
-		Assert.assertEquals(true, appFrame.isDisplayed());
-		Assert.assertEquals(true, saveButton.isDisplayed());
-		Assert.assertEquals(true, testForm.isDisplayed());
-		Assert.assertEquals(true, inputCodeField.isDisplayed());
-		Assert.assertEquals(true, cancelButton.isDisplayed());
-		Assert.assertEquals(true, textSampleWebsite.isDisplayed());
-		Assert.assertEquals(true, textFooter.isDisplayed());
+		Assert.assertEquals(true, emailInput.isDisplayed());
+		Assert.assertEquals(true, passwordInput.isDisplayed());
+		Assert.assertEquals(true, comeInButton.isDisplayed());
 		screenshot.capturePageScreenshot();
 		return this;
 	}
 
 	@Step
-	public MainPage clickOnCancelButton(){
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("cancelForm")));
-		cancelButton.click();
+	public MainPage validationOnCorrectData(){
+		emailInput.sendKeys("zakupkitest@gmail.com");
+		passwordInput.sendKeys("Password123!");
+		comeInButton.click();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[text()='Як почати брати участь у закупівлях']")));
+		Assert.assertTrue(headerAfterLoginPageText.isDisplayed());
 		screenshot.capturePageScreenshot();
 		return this;
 	}
 
 	@Step
-	public MainPage clickOnOKButton(){
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("saveForm")));
-		saveButton.click();
+	public MainPage validationOnEmptyFields(){
+		comeInButton.click();
+		Assert.assertTrue(enterEmailText.isDisplayed());
+		Assert.assertTrue(errorEmailInput.isDisplayed());
+		Assert.assertTrue(errorPasswordInput.isDisplayed());
 		screenshot.capturePageScreenshot();
 		return this;
 	}
 
 	@Step
-	public MainPage validationOnEmptyField(){
-		saveButton.click();
-		String valMes = getValidationMessage();
-		Assert.assertEquals("Заполните это поле.", valMes );
+	public MainPage validationOnValidEmailAndEmptyPassword(){
+		emailInput.sendKeys("zakupkitest@gmail.com");
+		comeInButton.click();
+		Assert.assertTrue(errorPasswordInput.isDisplayed());
+		Assert.assertTrue(enterPasswordText.isDisplayed());
 		screenshot.capturePageScreenshot();
 		return this;
 	}
 
 	@Step
-	public MainPage validationOnMinLengthField(){
-		inputCodeField.sendKeys("12");
-		saveButton.click();
-		String valMes = getValidationMessage();
-		Assert.assertEquals("Минимально допустимое количество символов: 3. Длина текста сейчас: 2.", valMes );
+	public MainPage validationOnIncorrectEmailField(){
+		emailInput.sendKeys("zakupkitest22@gmail.com");
+		passwordInput.sendKeys("Password123!");
+		comeInButton.click();
+		wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//input[@class='form-login-input error']")));
+		Assert.assertTrue(errorEmailInput.isDisplayed());
+		Assert.assertTrue(verifyEmailText.isDisplayed());
 		screenshot.capturePageScreenshot();
 		return this;
 	}
 
 	@Step
-	public MainPage validationOnMaxLengthField(){
-		inputCodeField.sendKeys("1234567890123456789");
-		WebElement input = webDriver.findElement(By.id("input_code"));
-		Assert.assertEquals("1234567890", input.getAttribute("value"));
+	public MainPage validationOnValidEmailAndIncorrectPassword(){
+		emailInput.sendKeys("zakupkitest@gmail.com");
+		passwordInput.sendKeys("Password12345!");
+		comeInButton.click();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[contains(@class, 'zak-pass-style-log error')]")));
+		Assert.assertTrue(errorPasswordInput.isDisplayed());
+		Assert.assertTrue(incorrectPasswordText.isDisplayed());
 		screenshot.capturePageScreenshot();
 		return this;
-	}
-
-	@Step
-	public MainPage validationOnNumbersField(){
-		inputCodeField.sendKeys("12345");
-		saveButton.click();
-		WebElement input = webDriver.findElement(By.id("input_code"));
-		Assert.assertEquals("", input.getText());
-		screenshot.capturePageScreenshot();
-		return this;
-	}
-
-	@Step
-	public MainPage validationOnEnglishLettersField(){
-		inputCodeField.sendKeys("test");
-		saveButton.click();
-		WebElement input = webDriver.findElement(By.id("input_code"));
-		Assert.assertEquals("", input.getText());
-		screenshot.capturePageScreenshot();
-		return this;
-	}
-
-	@Step
-	public MainPage validationOnUkrainianLettersField(){
-		inputCodeField.sendKeys("Україна");
-		saveButton.click();
-		WebElement input = webDriver.findElement(By.id("input_code"));
-		Assert.assertEquals("", input.getText());
-		screenshot.capturePageScreenshot();
-		return this;
-	}
-
-	@Step
-	public MainPage validationOnNumbersWithSpacesField(){
-		inputCodeField.sendKeys("  1 2 3   ");
-		saveButton.click();
-		WebElement input = webDriver.findElement(By.id("input_code"));
-		Assert.assertEquals("", input.getText());
-		screenshot.capturePageScreenshot();
-		return this;
-	}
-
-	@Step
-	public MainPage validationOnSpacesField(){
-		inputCodeField.sendKeys("     ");
-		saveButton.click();
-		WebElement input = webDriver.findElement(By.id("input_code"));
-		Assert.assertEquals("", input.getText());
-		screenshot.capturePageScreenshot();
-		return this;
-	}
-
-	@Step
-	public GooglePage verifyGooglePageDisplayed() throws Exception{
-		Assert.assertEquals(true, googleFrame.isDisplayed());
-		screenshot.capturePageScreenshot();
-		return googlePage;
 	}
 }

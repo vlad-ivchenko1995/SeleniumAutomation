@@ -126,7 +126,7 @@
 				<user.username></user.username>
 				<user.password></user.password>
 				<grid2.hub></grid2.hub>
-				<site.url>file:///Users/macbook/Downloads/QA/Ivchenko_TestTask/target/SampleWebSite/form.html</site.url>
+				<site.url>https://zakupki.com.ua/login</site.url>
 				<browser.name>chrome</browser.name>
 				<browser.version></browser.version>
 				<browser.platform></browser.platform>

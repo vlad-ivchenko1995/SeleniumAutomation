@@ -43,10 +43,6 @@ public class TestBase extends TestListenerAdapter{
 		webDriver = WebDriverFactory.getInstance(gridHubUrl, browser);
         webDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         webDriver.manage().window().maximize();
-		
-//		testrail = new APIClient("https://leaf.testrail.com/");
-//		testrail.setUser("serhat@vngrs.com");
-//		testrail.setPassword("23672367");
 
 		EventFiringWebDriver driver = new EventFiringWebDriver(webDriver);
 		webDriver = driver;
